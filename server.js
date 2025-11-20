@@ -15,12 +15,23 @@ connectDB();
 
 const app=express();
 
+const allowedOrigins = [
+  process.env.CLIENT_URL,      // localhost
+  process.env.FOREIGN_URL  // Vercel frontend
+];
+
 const corsOptions = {
-    origin:[process.env.CLIENT_URL,process.env.FOREIGN_URL], 
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], 
-    credentials: true, 
-  };
-  console.log("CLIENT_URL from .env:", process.env.CLIENT_URL);
+  origin: (origin, callback) => {
+    // allow requests with no origin like Postman
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET","POST","PUT","DELETE","PATCH"],
+  credentials: true
+};
 
 app.use(cors(corsOptions))
 
