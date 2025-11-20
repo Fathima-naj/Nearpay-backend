@@ -13,37 +13,48 @@ import cors from "cors";
 dotenv.config();
 connectDB();
 
-const app=express();
+const app = express();
 
-const allowedOrigins = [
-  process.env.CLIENT_URL,      // localhost
-  process.env.FOREIGN_URL  // Vercel frontend
-];
-
+// Enhanced CORS configuration
 const corsOptions = {
-  origin: (origin, callback) => {
-    // allow requests with no origin like Postman
-    if (!origin || allowedOrigins.includes(origin)) {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      process.env.CLIENT_URL,      // localhost
+      process.env.FOREIGN_URL,     // Vercel frontend
+      'https://nearpay-frontend.vercel.app', // hardcoded for safety
+      'http://localhost:3000'      // hardcoded for safety
+    ];
+    
+    // Check if the origin is in allowed origins
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      console.log('Blocked by CORS:', origin);
+      callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ["GET","POST","PUT","DELETE","PATCH"],
-  credentials: true
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
 };
 
-app.use(cors(corsOptions))
+app.use(cors(corsOptions));
+
+// Handle preflight requests explicitly
+app.options('*', cors(corsOptions));
 
 app.use(express.json())
 app.use(cookieParser())
 
-app.use('/api/users',userRoutes)
-app.use('/api/category',categoryRoutes)
-app.use('/api/budget',budgetRoutes)
-app.use('/api/expense',expenseRoutes)
-app.use('/api/report',reportRoutes)
-app.use('/api/dashboard',dashboardRoutes)
+app.use('/api/users', userRoutes)
+app.use('/api/category', categoryRoutes)
+app.use('/api/budget', budgetRoutes)
+app.use('/api/expense', expenseRoutes)
+app.use('/api/report', reportRoutes)
+app.use('/api/dashboard', dashboardRoutes)
 
-const PORT=process.env.PORT||5000;
-app.listen(PORT,()=>console.log(`server running at ${PORT}`))
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running at ${PORT}`))
