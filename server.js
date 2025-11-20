@@ -23,7 +23,7 @@ const corsOptions = {
   console.log("CLIENT_URL from .env:", process.env.CLIENT_URL);
 
 app.use(cors(corsOptions))
-
+app.options("*", cors(corsOptions)); 
 app.use(express.json())
 app.use(cookieParser())
 
