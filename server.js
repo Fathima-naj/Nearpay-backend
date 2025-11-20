@@ -14,29 +14,18 @@ dotenv.config();
 connectDB();
 
 const app=express();
-app.use(express.json())
-app.use(cookieParser())
-
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  process.env.CLIENT_URL_PROD
-];
 
 const corsOptions = {
-  origin: (origin, callback) => {
-    
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  credentials: true
-};
+    origin:[process.env.CLIENT_URL,process.env.FOREIGN_URL], // Add frontend URL here,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Allowed methods
+    credentials: true, // Allow credentials (cookies, HTTP authentication)
+  };
+  console.log("CLIENT_URL from .env:", process.env.CLIENT_URL);
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.use(cors(corsOptions))
+
+app.use(express.json())
+app.use(cookieParser())
 
 app.use('/api/users',userRoutes)
 app.use('/api/category',categoryRoutes)
