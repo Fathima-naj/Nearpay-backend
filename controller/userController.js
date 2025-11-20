@@ -49,10 +49,11 @@ export const logoutUser = async (req, res) => {
 
     res.clearCookie("token", {
       httpOnly: true,
-      secure: false, 
-      sameSite: "lax",
+      secure: true,       
+      sameSite: "none",   
       path: "/",
     });
+
 
     res.status(200).json({ message: "Logged out successfully" });
   } catch (err) {
