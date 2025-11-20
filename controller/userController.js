@@ -27,12 +27,15 @@ export const loginUser = async (req, res) => {
 
     const accessToken = generateAccessToken(user);
 
-    res.cookie("token", accessToken, {
-      httpOnly: true,
-      secure: true, 
-      sameSite: "none", 
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+   const isProduction = process.env.NODE_ENV === "production";
+
+      res.cookie("token", accessToken, {
+        httpOnly: true,
+        secure: isProduction,           
+        sameSite: isProduction ? "none" : "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
 
     res.status(200).json({
       user: { id: user._id, email: user.email },
