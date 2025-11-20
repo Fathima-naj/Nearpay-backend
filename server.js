@@ -16,9 +16,9 @@ connectDB();
 const app=express();
 
 const corsOptions = {
-    origin:[process.env.CLIENT_URL,"https://nearpay-frontend.vercel.app"], // Add frontend URL here,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Allowed methods
-    credentials: true, // Allow credentials (cookies, HTTP authentication)
+    origin:[process.env.CLIENT_URL,process.env.FOREIGN_URL], 
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], 
+    credentials: true, 
   };
   console.log("CLIENT_URL from .env:", process.env.CLIENT_URL);
 
