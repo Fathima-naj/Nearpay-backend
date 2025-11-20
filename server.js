@@ -15,10 +15,9 @@ connectDB();
 
 const app = express();
 
-// MIDDLEWARE ORDER: cors -> json -> cookieParser
 const allowedOrigins = [
-  process.env.CLIENT_URL,         // localhost
-  process.env.FOREIGN_URL,        // Vercel frontend
+  process.env.CLIENT_URL,      
+  process.env.FOREIGN_URL,        
   'https://nearpay-frontend.vercel.app',
   'http://localhost:5173'
 ];
@@ -28,15 +27,14 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) callback(null, true);
     else callback(new Error('Not allowed by CORS'));
   },
-  credentials: true,                   // important for cookies
+  credentials: true,                
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
-
-app.use(express.json());
 app.use(cookieParser());
 
-// ROUTES
+app.use(express.json());
+
 app.use('/api/users', userRoutes);
 app.use('/api/category', categoryRoutes);
 app.use('/api/budget', budgetRoutes);

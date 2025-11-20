@@ -29,10 +29,10 @@ export const loginUser = async (req, res) => {
 
     res.cookie("token", accessToken, {
       httpOnly: true,
-      secure: isProduction,               // true on HTTPS, false on localhost
+      secure: isProduction,               
       sameSite: isProduction ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: "/",                          // ensure cookie is sent for all routes
+      path: "/",                          
     });
 
     res.status(200).json({
