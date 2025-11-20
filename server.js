@@ -17,14 +17,25 @@ const app=express();
 app.use(express.json())
 app.use(cookieParser())
 
-const corsOptions = {
-    origin:process.env.CLIENT_URL, 
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], 
-    credentials: true, 
-  };
-  console.log("CLIENT_URL from .env:", process.env.CLIENT_URL);
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  process.env.CLIENT_URL_PROD
+];
 
-app.use(cors(corsOptions))
+const corsOptions = {
+  origin: (origin, callback) => {
+    
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 
 app.use('/api/users',userRoutes)
 app.use('/api/category',categoryRoutes)
