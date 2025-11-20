@@ -1,4 +1,4 @@
-import {  logoutUserService, userLoginServices, userResgisterServices } from "../service/userService.js";
+import { logoutUserService, userLoginServices, userResgisterServices } from "../service/userService.js";
 import { generateAccessToken } from "../utilis/jwt.js";
 import { loginValidation, registerValidation } from "../validation/userValidation.js";
 
@@ -6,9 +6,8 @@ export const registerUser = async (req, res) => {
   try {
     const data = req.body;
     const { error } = registerValidation.validate(data);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
     await userResgisterServices(data);
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
@@ -26,16 +25,15 @@ export const loginUser = async (req, res) => {
     if (!user) return res.status(401).json({ message: "Invalid email or password" });
 
     const accessToken = generateAccessToken(user);
+    const isProduction = process.env.NODE_ENV === "production";
 
-   const isProduction = process.env.NODE_ENV === "production";
-
-      res.cookie("token", accessToken, {
-        httpOnly: true,
-        secure: isProduction,           
-        sameSite: isProduction ? "none" : "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
-
+    res.cookie("token", accessToken, {
+      httpOnly: true,
+      secure: isProduction,               // true on HTTPS, false on localhost
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",                          // ensure cookie is sent for all routes
+    });
 
     res.status(200).json({
       user: { id: user._id, email: user.email },
@@ -50,13 +48,14 @@ export const logoutUser = async (req, res) => {
   try {
     await logoutUserService?.();
 
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.clearCookie("token", {
       httpOnly: true,
-      secure: true,       
-      sameSite: "none",   
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
       path: "/",
     });
-
 
     res.status(200).json({ message: "Logged out successfully" });
   } catch (err) {
